@@ -43,10 +43,20 @@ pipeline {
         }
     }
 
-    stage('Deploy to Kubernetes') {
+    stage('Deploy - Template and Apply') {
+        steps {
+            sh '''
+            export IMAGE_TAG=$BUILD_NUMBER
+            envsubst < py-deploy.yaml | kubectl apply -f -
+            kubectl rollout status deployment/py-deploy
+            '''
+        }
+    }
+
+    stage('Check on Kubernetes') {
       steps {
         sh '''
-          kubectl apply -f .
+
           kubectl get pods
           kubectl get svc
           kubectl get deployments
