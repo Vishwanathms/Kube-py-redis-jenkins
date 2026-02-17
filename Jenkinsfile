@@ -17,23 +17,31 @@ pipeline {
         sh "docker ps -a"
       }
     }
-    // stage('Build Docker Image') {
-    //   steps {
-    //     script {
-    //       def dockerImage = docker.build("vishwa-kube/agent:${env.BUILD_ID}")
-    //     }
-    //   }
-    // }
+    stage('Build Docker Image') {
+      steps {
+        sh '''
+          docker build -t vishwacloudlab/py-feb26:$BUILD_NUMBER python-sample-app
+        '''
+      }
+    }
 
-    // stage('Push Docker Image') {
-    //   steps {
-    //     script {
-    //       docker.withRegistry('https://index.docker.io/v1/', 'dockerhub-credentials-id') {
-    //         dockerImage.push()
-    //       }
-    //     }
-    //   }
-    // }
+    stage('Push Docker Image') {
+        steps {
+            withCredentials([
+            usernamePassword(
+                credentialsId: 'vishwa-dockerhub-creds',
+                usernameVariable: 'DOCKERHUB_USER',
+                passwordVariable: 'DOCKERHUB_PASS'
+            )
+            ]) {
+            sh '''
+                echo "$DOCKERHUB_PASS" | docker login -u "$DOCKERHUB_USER" --password-stdin
+                docker push vishwacloudlab/py-feb26:$BUILD_NUMBER
+                docker logout
+            '''
+            }
+        }
+    }
 
     stage('Deploy to Kubernetes') {
       steps {
