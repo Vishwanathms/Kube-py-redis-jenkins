@@ -20,7 +20,7 @@ pipeline {
     stage('Build Docker Image') {
       steps {
         sh '''
-          docker build -t vishwacloudlab/py-feb26:$BUILD_NUMBER python-sample-app
+          docker build -t vishwacloudlab/py-feb26:$BUILD_NUMBER python-sample-code
         '''
       }
     }
