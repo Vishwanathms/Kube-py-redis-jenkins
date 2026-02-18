@@ -46,7 +46,11 @@ pipeline {
     stage('Deploy - Helm Chart') {
         steps {
             sh '''
-            kubectl apply -f vishwanginx-app.yaml
+            helm upgrade --install py-redis-app ./helm/py-redis-app \
+              --set pythonApp.image.tag=$BUILD_NUMBER \
+              --wait \
+              --timeout 5m
+            kubectl rollout status deployment/py-deploy
             '''
         }
     }
