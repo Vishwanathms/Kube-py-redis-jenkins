@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: py-service
+spec:
+  type: {{ .Values.pythonApp.service.type }}
+  selector:
+    app: python-app
+  ports:
+    - port: {{ .Values.pythonApp.service.port }}
+      targetPort: {{ .Values.pythonApp.service.targetPort }}
+      {{- if eq .Values.pythonApp.service.type "NodePort" }}
+      nodePort: {{ .Values.pythonApp.service.nodePort }}
+      {{- end }}

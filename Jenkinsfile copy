@@ -43,13 +43,11 @@ pipeline {
         }
     }
 
-    stage('Deploy - Helm Chart') {
+    stage('Deploy - Template and Apply') {
         steps {
             sh '''
-            helm upgrade --install py-redis-app ./helm/py-redis-app \
-              --set pythonApp.image.tag=$BUILD_NUMBER \
-              --wait \
-              --timeout 5m
+            export IMAGE_TAG=$BUILD_NUMBER
+            envsubst < py-deploy.yaml | kubectl apply -f -
             kubectl rollout status deployment/py-deploy
             '''
         }

@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.pythonApp.name }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  strategy:
+    type: {{ .Values.strategy.type }}
+    rollingUpdate:
+      maxUnavailable: {{ .Values.strategy.rollingUpdate.maxUnavailable }}
+      maxSurge: {{ .Values.strategy.rollingUpdate.maxSurge }}
+  selector:
+    matchLabels:
+      app: python-app
+  template:
+    metadata:
+      labels:
+        app: python-app
+    spec:
+      containers:
+        - name: python-container
+          image: "{{ .Values.pythonApp.image.repository }}:{{ .Values.pythonApp.image.tag }}"
+          imagePullPolicy: {{ .Values.pythonApp.image.pullPolicy }}
+          ports:
+            - containerPort: {{ .Values.pythonApp.port }}
+          envFrom:
+            - configMapRef:
+                name: {{ .Values.configMap.name }}
+          resources:
+            requests:
+              cpu: "{{ .Values.pythonApp.resources.requests.cpu }}"
+              memory: "{{ .Values.pythonApp.resources.requests.memory }}"
+            limits:
+              cpu: "{{ .Values.pythonApp.resources.limits.cpu }}"
+              memory: "{{ .Values.pythonApp.resources.limits.memory }}"

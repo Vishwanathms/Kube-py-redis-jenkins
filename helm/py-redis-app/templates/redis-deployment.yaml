@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.redis.name }}
+spec:
+  replicas: {{ .Values.redis.replicas }}
+  strategy:
+    type: {{ .Values.strategy.type }}
+    rollingUpdate:
+      maxUnavailable: {{ .Values.strategy.rollingUpdate.maxUnavailable }}
+      maxSurge: {{ .Values.strategy.rollingUpdate.maxSurge }}
+  selector:
+    matchLabels:
+      app: redis-app
+  template:
+    metadata:
+      labels:
+        app: redis-app
+    spec:
+      containers:
+        - name: redis-container
+          image: "{{ .Values.redis.image.repository }}:{{ .Values.redis.image.tag }}"
+          imagePullPolicy: {{ .Values.redis.image.pullPolicy }}
+          ports:
+            - containerPort: {{ .Values.redis.port }}
+          resources:
+            requests:
+              cpu: "{{ .Values.redis.resources.requests.cpu }}"
+              memory: "{{ .Values.redis.resources.requests.memory }}"
+            limits:
+              cpu: "{{ .Values.redis.resources.limits.cpu }}"
+              memory: "{{ .Values.redis.resources.limits.memory }}"
