@@ -4,6 +4,13 @@ pipeline {
     pollSCM('H/2 * * * *')
   }
 
+  environment {
+    IMAGE_NAME = "vishwacloudlab/py-feb26"
+    Host_IP = "172.31.14.184"
+    Host_Port = "30110"
+    hub_cred = "vishwa-dockerhub-creds"
+  }
+
   stages {
 
     stage('Checkout') {
@@ -21,7 +28,7 @@ pipeline {
     stage('Build Docker Image') {
       steps {
         sh '''
-          docker build -t vishwacloudlab/py-feb26:$BUILD_NUMBER python-sample-code
+          docker build -t ${IMAGE_NAME}:$BUILD_NUMBER python-sample-code
         '''
       }
     }
@@ -31,7 +38,7 @@ pipeline {
           trivy image \
             --severity HIGH,CRITICAL \
             --no-progress \
-            vishwacloudlab/py-feb26:$BUILD_NUMBER
+            ${IMAGE_NAME}:$BUILD_NUMBER
         '''
       }
     }
@@ -39,14 +46,14 @@ pipeline {
         steps {
             withCredentials([
             usernamePassword(
-                credentialsId: 'vishwa-dockerhub-creds',
+                credentialsId: "${hub_cred}",
                 usernameVariable: 'DOCKERHUB_USER',
                 passwordVariable: 'DOCKERHUB_PASS'
             )
             ]) {
             sh '''
                 echo "$DOCKERHUB_PASS" | docker login -u "$DOCKERHUB_USER" --password-stdin
-                docker push vishwacloudlab/py-feb26:$BUILD_NUMBER
+                docker push ${IMAGE_NAME}:$BUILD_NUMBER
                 docker logout
             '''
             }
@@ -79,7 +86,7 @@ pipeline {
       steps {
         sh '''
           sleep 10
-          curl http://172.31.14.184:30110
+          curl http://${Host_IP}:${Host_Port}
         '''
       }
     }
