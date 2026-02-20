@@ -31,7 +31,7 @@ pipeline {
           trivy image \
             --severity HIGH,CRITICAL \
             --no-progress \
-            ${IMAGE_NAME}:${IMAGE_TAG}
+            vishwacloudlab/py-feb26:$BUILD_NUMBER
         '''
       }
     }
