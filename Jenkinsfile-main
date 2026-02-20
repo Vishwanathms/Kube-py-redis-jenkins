@@ -1,6 +1,6 @@
 pipeline {
   agent {label 'vishwa-kube'}
-  
+
   triggers {
     pollSCM('H/2 * * * *')
   }
@@ -10,6 +10,7 @@ pipeline {
     Host_IP = "172.31.14.184"
     Host_Port = "30110"
     hub_cred = "vishwa-dockerhub-creds"
+    app_path = "python-sample-code"
   }
 
   stages {
@@ -29,7 +30,7 @@ pipeline {
     stage('Build Docker Image') {
       steps {
         sh '''
-          docker build -t ${IMAGE_NAME}:$BUILD_NUMBER python-sample-code
+          docker build -t ${IMAGE_NAME}:$BUILD_NUMBER ${app_path}
         '''
       }
     }
